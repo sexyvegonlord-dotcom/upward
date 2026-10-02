@@ -1,0 +1,92 @@
+-- Always Face Upward - L Toggle
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+
+local LocalPlayer = Players.LocalPlayer
+
+local enabled = false
+local connection = nil
+
+local Character
+local HumanoidRootPart
+
+--------------------------------------------------
+-- CHARACTER
+--------------------------------------------------
+
+local function setupCharacter(char)
+	Character = char
+	HumanoidRootPart = char:WaitForChild("HumanoidRootPart")
+end
+
+setupCharacter(
+	LocalPlayer.Character
+		or LocalPlayer.CharacterAdded:Wait()
+)
+
+LocalPlayer.CharacterAdded:Connect(function(char)
+	setupCharacter(char)
+end)
+
+--------------------------------------------------
+-- FACE UPWARD
+--------------------------------------------------
+
+local function startFacingUp()
+
+	if connection then
+		connection:Disconnect()
+	end
+
+	connection = RunService.RenderStepped:Connect(function()
+
+		if not enabled then
+			return
+		end
+
+		if not HumanoidRootPart
+			or not HumanoidRootPart.Parent then
+			return
+		end
+
+		-- Keep the character's current position,
+		-- but rotate it so the character faces straight upward.
+		HumanoidRootPart.CFrame =
+			CFrame.new(HumanoidRootPart.Position)
+			* CFrame.Angles(
+				math.rad(-90),
+				0,
+				0
+			)
+	end)
+end
+
+--------------------------------------------------
+-- L TOGGLE
+--------------------------------------------------
+
+UserInputService.InputBegan:Connect(function(input)
+
+	if input.KeyCode == Enum.KeyCode.L then
+
+		enabled = not enabled
+
+		if enabled then
+
+			print("Facing Upward: ON")
+
+			startFacingUp()
+
+		else
+
+			print("Facing Upward: OFF")
+
+			if connection then
+				connection:Disconnect()
+				connection = nil
+			end
+		end
+	end
+end)
