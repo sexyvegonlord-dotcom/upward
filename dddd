@@ -1,4 +1,4 @@
--- Always Face Upward - L Toggle
+-- Always Face Opposite Upward - L Toggle
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -31,7 +31,7 @@ LocalPlayer.CharacterAdded:Connect(function(char)
 end)
 
 --------------------------------------------------
--- FACE UPWARD
+-- FACE OPPOSITE UPWARD
 --------------------------------------------------
 
 local function startFacingUp()
@@ -51,12 +51,11 @@ local function startFacingUp()
 			return
 		end
 
-		-- Keep the character's current position,
-		-- but rotate it so the character faces straight upward.
+		-- Opposite direction from the previous version
 		HumanoidRootPart.CFrame =
 			CFrame.new(HumanoidRootPart.Position)
 			* CFrame.Angles(
-				math.rad(-90),
+				math.rad(90),
 				0,
 				0
 			)
@@ -75,13 +74,13 @@ UserInputService.InputBegan:Connect(function(input)
 
 		if enabled then
 
-			print("Facing Upward: ON")
+			print("Opposite Upward: ON")
 
 			startFacingUp()
 
 		else
 
-			print("Facing Upward: OFF")
+			print("Opposite Upward: OFF")
 
 			if connection then
 				connection:Disconnect()
