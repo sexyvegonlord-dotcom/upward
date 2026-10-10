@@ -1,4 +1,5 @@
--- Always Face Opposite Upward - L Toggle
+
+-- Always Face Upside Down - P Toggle
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -12,80 +13,50 @@ local connection = nil
 local Character
 local HumanoidRootPart
 
---------------------------------------------------
--- CHARACTER
---------------------------------------------------
-
 local function setupCharacter(char)
-	Character = char
-	HumanoidRootPart = char:WaitForChild("HumanoidRootPart")
+    Character = char
+    HumanoidRootPart = char:WaitForChild("HumanoidRootPart")
 end
 
 setupCharacter(
-	LocalPlayer.Character
-		or LocalPlayer.CharacterAdded:Wait()
+    LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 )
 
-LocalPlayer.CharacterAdded:Connect(function(char)
-	setupCharacter(char)
-end)
+LocalPlayer.CharacterAdded:Connect(setupCharacter)
 
---------------------------------------------------
--- FACE OPPOSITE UPWARD
---------------------------------------------------
+local function startUpsideDown()
+    if connection then
+        connection:Disconnect()
+    end
 
-local function startFacingUp()
+    connection = RunService.RenderStepped:Connect(function()
+        if not enabled then return end
+        if not HumanoidRootPart or not HumanoidRootPart.Parent then
+            return
+        end
 
-	if connection then
-		connection:Disconnect()
-	end
-
-	connection = RunService.RenderStepped:Connect(function()
-
-		if not enabled then
-			return
-		end
-
-		if not HumanoidRootPart
-			or not HumanoidRootPart.Parent then
-			return
-		end
-
-		-- Opposite direction from the previous version
-		HumanoidRootPart.CFrame =
-			CFrame.new(HumanoidRootPart.Position)
-			* CFrame.Angles(
-				math.rad(90),
-				0,
-				0
-			)
-	end)
+        HumanoidRootPart.CFrame =
+            CFrame.new(HumanoidRootPart.Position)
+            * CFrame.Angles(0, 0, math.rad(180))
+    end)
 end
 
---------------------------------------------------
--- L TOGGLE
---------------------------------------------------
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
 
-UserInputService.InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.P then
+        enabled = not enabled
 
-	if input.KeyCode == Enum.KeyCode.P then
+        if enabled then
+            print("Upside Down: ON")
+            startUpsideDown()
+        else
+            print("Upside Down: OFF")
 
-		enabled = not enabled
-
-		if enabled then
-
-			print("Opposite Upward: ON")
-
-			startFacingUp()
-
-		else
-
-			print("Opposite Upward: OFF")
-
-			if connection then
-				connection:Disconnect()
-				connection = nil
-			end
-		end
-	end
+            if connection then
+                connection:Disconnect()
+                connection = nil
+            end
+        end
+    end
 end)
